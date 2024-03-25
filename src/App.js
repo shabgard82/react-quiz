@@ -6,19 +6,27 @@ import Loader from "./components/Loader";
 import Error from "./components/Error";
 import StartScreen from "./components/StartScreen";
 import Questions from "./components/Questions";
+import Progress from "./components/Progress";
+import NextButton from "./components/NextButton";
 
 const initialState = {
   questions: [],
   status: "loading",
   index: 0,
+  answer: null,
+  points: 0,
 };
 
 export default function App() {
-  const [{ questions, status, index }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
     Reducer,
     initialState
   );
   const numQuestions = questions.length;
+  const maxPossiblePoints = questions.reduce(
+    (prev, cur) => prev + cur.points,
+    0
+  );
 
   useEffect(function () {
     fetch("http://localhost:9000/Questions")
@@ -35,7 +43,22 @@ export default function App() {
         {status === "ready" && (
           <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
         )}
-        {status === "active" && <Questions questions={questions[index]} />}
+        {status === "active" && (
+          <>
+            <Progress
+              numQuestions={numQuestions}
+              index={index}
+              points={points}
+              maxPossiblePoints={maxPossiblePoints}
+            />
+            <Questions
+              questions={questions[index]}
+              answer={answer}
+              dispatch={dispatch}
+            />
+            <NextButton answer={answer} dispatch={dispatch} />
+          </>
+        )}
       </Main>
     </div>
   );
