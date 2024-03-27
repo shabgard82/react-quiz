@@ -9,6 +9,8 @@ import Questions from "./components/Questions";
 import Progress from "./components/Progress";
 import NextButton from "./components/NextButton";
 import FinishScreen from "./components/FinishScreen";
+import Footer from "./components/Footer";
+import Timer from "./components/Timer";
 
 const initialState = {
   questions: [],
@@ -16,13 +18,12 @@ const initialState = {
   index: 0,
   answer: null,
   points: 0,
+  seconds: null,
 };
 
 export default function App() {
-  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
-    Reducer,
-    initialState
-  );
+  const [{ questions, status, index, answer, points, seconds }, dispatch] =
+    useReducer(Reducer, initialState);
   const numQuestions = questions.length;
   const maxPossiblePoints = questions.reduce(
     (prev, cur) => prev + cur.points,
@@ -58,16 +59,23 @@ export default function App() {
               answer={answer}
               dispatch={dispatch}
             />
-            <NextButton
-              answer={answer}
-              dispatch={dispatch}
-              numQuestions={numQuestions}
-              index={index}
-            />
+            <Footer>
+              <Timer dispatch={dispatch} seconds={seconds} />
+              <NextButton
+                answer={answer}
+                dispatch={dispatch}
+                numQuestions={numQuestions}
+                index={index}
+              />
+            </Footer>
           </>
         )}
         {status === "finished" && (
-          <FinishScreen points={points} maxPossiblePoints={maxPossiblePoints} />
+          <FinishScreen
+            points={points}
+            maxPossiblePoints={maxPossiblePoints}
+            dispatch={dispatch}
+          />
         )}
       </Main>
     </div>
